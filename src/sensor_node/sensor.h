@@ -3,7 +3,7 @@
  * @{
  *
  * @file
- * @brief       Implements sensor control
+ * @brief       Defines sensor stuff
  *
  * @author      smlng <s@mlng.net>
  *

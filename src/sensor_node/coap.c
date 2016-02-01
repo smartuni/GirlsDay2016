@@ -1,5 +1,13 @@
 /**
- * written by smlng
+ * @ingroup     smartuni
+ * @{
+ *
+ * @file
+ * @brief       Implements coap backend
+ *
+ * @author      smlng <s@mlng.net>
+ *
+ * @}
  */
 
 // standard
@@ -38,12 +46,21 @@ static msg_t coap_thread_msg_queue[COAP_MSG_QUEUE_SIZE];
 static char endpoints_response[COAP_REPSONSE_LENGTH] = "";
 
 static const coap_endpoint_path_t path_well_known_core = {2, {".well-known", "core"}};
+static const coap_endpoint_path_t path_humidity = {1, {"humidity"}};
+static const coap_endpoint_path_t path_led = {1, {"led"}};
+static const coap_endpoint_path_t path_temperature = {1, {"temperature"}};
+
+/**
+ * @brief handle well-known path request
+ */
 static int handle_get_well_known_core(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt, uint8_t id_hi, uint8_t id_lo)
 {
     return coap_make_response(scratch, outpkt, (const uint8_t *)endpoints_response, strlen(endpoints_response), id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT, COAP_CONTENTTYPE_APPLICATION_LINKFORMAT);
 }
 
-static const coap_endpoint_path_t path_humidity = {1, {"humidity"}};
+/**
+ * @brief handle get humidity request
+ */
 static int handle_get_humidity(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt, uint8_t id_hi, uint8_t id_lo)
 {
     int h = sensor_get_humidity();
@@ -52,7 +69,9 @@ static int handle_get_humidity(coap_rw_buffer_t *scratch, const coap_packet_t *i
     return coap_make_response(scratch, outpkt, (const uint8_t *)bufstr, strlen(bufstr), id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT, COAP_CONTENTTYPE_TEXT_PLAIN);
 }
 
-static const coap_endpoint_path_t path_temperature = {1, {"temperature"}};
+/**
+ * @brief handle get temperature request
+ */
 static int handle_get_temperature(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt, uint8_t id_hi, uint8_t id_lo)
 {
     int t = sensor_get_temperature();
@@ -61,7 +80,9 @@ static int handle_get_temperature(coap_rw_buffer_t *scratch, const coap_packet_t
     return coap_make_response(scratch, outpkt, (const uint8_t *)bufstr, strlen(bufstr), id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT, COAP_CONTENTTYPE_TEXT_PLAIN);
 }
 
-static const coap_endpoint_path_t path_led = {1, {"led"}};
+/**
+ * @brief handle put led request
+ */
 static int handle_put_led(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt, uint8_t id_hi, uint8_t id_lo)
 {
     if (inpkt->payload.p[0] == '1') {

@@ -1,7 +1,15 @@
 /**
- * written by smlng
+ * @ingroup     smartuni
+ * @{
+ *
+ * @file
+ * @brief       Main control loop
+ *
+ * @author      smlng <s@mlng.net>
+ *
+ * @}
  */
-
+ 
 // standard
  #include <inttypes.h>
  #include <stdio.h>
