@@ -17,6 +17,8 @@
 #include "periph/gpio.h"
 #include "thread.h"
 #include "coap.h"
+// own
+#include "sensor.h"
 
  // compatibility
  #ifndef LED_ON
@@ -45,13 +47,19 @@ static int handle_get_well_known_core(coap_rw_buffer_t *scratch, const coap_pack
 static const coap_endpoint_path_t path_humidity = {1, {"humidity"}};
 static int handle_get_humidity(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt, uint8_t id_hi, uint8_t id_lo)
 {
-    return coap_make_response(scratch, outpkt, (const uint8_t *)&led, 1, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT, COAP_CONTENTTYPE_TEXT_PLAIN);
+    int h = sensor_get_humidity();
+    char bufstr[COAP_BUF_SIZE];
+    sprintf(bufstr, "{sensor: 'humidity',unit: '%%',factor: 100,value: '%d'}", h);
+    return coap_make_response(scratch, outpkt, (const uint8_t *)bufstr, strlen(bufstr), id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT, COAP_CONTENTTYPE_TEXT_PLAIN);
 }
 
 static const coap_endpoint_path_t path_temperature = {1, {"temperature"}};
 static int handle_get_temperature(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt, uint8_t id_hi, uint8_t id_lo)
 {
-    return coap_make_response(scratch, outpkt, (const uint8_t *)&led, 1, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT, COAP_CONTENTTYPE_TEXT_PLAIN);
+    int t = sensor_get_temperature();
+    char bufstr[COAP_BUF_SIZE];
+    sprintf(bufstr, "{sensor: 'temperature',unit: 'C',factor: 100,value: '%d'}", t);
+    return coap_make_response(scratch, outpkt, (const uint8_t *)bufstr, strlen(bufstr), id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT, COAP_CONTENTTYPE_TEXT_PLAIN);
 }
 
 static const coap_endpoint_path_t path_led = {1, {"led"}};

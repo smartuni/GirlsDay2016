@@ -11,6 +11,8 @@
 #include "board.h"
 #include "periph/gpio.h"
 #include "shell.h"
+// own
+#include "sensor.h"
 
 //extern int coap_cmd(int argc, char **argv);
 extern int sensor_start_thread(void);
