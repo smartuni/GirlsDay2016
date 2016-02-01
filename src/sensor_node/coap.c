@@ -20,12 +20,12 @@
 // own
 #include "sensor.h"
 
- // compatibility
- #ifndef LED_ON
- #define LED_ON      LED_RED_ON
- #define LED_OFF     LED_RED_OFF
- #define LED_TOGGLE  LED_RED_TOGGLE
- #endif
+// compatibility
+#ifndef LED_ON
+#define LED_ON      LED_RED_ON
+#define LED_OFF     LED_RED_OFF
+#define LED_TOGGLE  LED_RED_TOGGLE
+#endif
 
 // parameters
 #define COAP_BUF_SIZE           (63)
