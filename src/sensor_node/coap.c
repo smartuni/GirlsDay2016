@@ -1,21 +1,22 @@
 /**
  * written by smlng
  */
- // standard
-  #include <inttypes.h>
-  #include <stdio.h>
-  #include <stdlib.h>
-  #include <string.h>
- // network
-  #include <arpa/inet.h>
-  #include <netinet/in.h>
-  #include <sys/socket.h>
-  #include <unistd.h>
- // riot
- #include "board.h"
+
+// standard
+#include <inttypes.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+// network
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
+// riot
+#include "board.h"
 #include "periph/gpio.h"
- #include "thread.h"
- #include "coap.h"
+#include "thread.h"
+#include "coap.h"
 
  // compatibility
  #ifndef LED_ON
@@ -30,17 +31,10 @@
  #define COAP_MSG_QUEUE_SIZE   (8U)
  #define COAP_REPSONSE_LENGTH   (1500)
 
-static char coap_server_stack[THREAD_STACKSIZE_DEFAULT];
-static msg_t coap_server_msg_queue[COAP_MSG_QUEUE_SIZE];
+static char coap_thread_stack[THREAD_STACKSIZE_DEFAULT];
+static msg_t coap_thread_msg_queue[COAP_MSG_QUEUE_SIZE];
 static char led = '0';
 static char endpoints_response[COAP_REPSONSE_LENGTH] = "";
-
-void _build_endpoints_response(void);
-
-void coap_setup_endpoints(void)
-{
-    _build_endpoints_response();
-}
 
 static const coap_endpoint_path_t path_well_known_core = {2, {".well-known", "core"}};
 static int handle_get_well_known_core(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt, uint8_t id_hi, uint8_t id_lo)
@@ -92,7 +86,7 @@ const coap_endpoint_t endpoints[] =
     {(coap_method_t)0, NULL, NULL, NULL}
 };
 
-void _build_endpoints_response(void)
+static void setup_endpoints(void)
 {
     uint16_t len = COAP_REPSONSE_LENGTH;
     const coap_endpoint_t *ep = endpoints;
@@ -138,7 +132,7 @@ void _build_endpoints_response(void)
  *
  * @param[in] arg   unused
  */
-void *coap_server(void *arg)
+static void *coap_thread(void *arg)
 {
     (void) arg;
     // start coap listener
@@ -150,7 +144,7 @@ void *coap_server(void *arg)
     uint8_t scratch_raw[COAP_BUF_SIZE];
     coap_rw_buffer_t scratch_buf = {scratch_raw, sizeof(scratch_raw)};
 
-    msg_init_queue(coap_server_msg_queue, COAP_MSG_QUEUE_SIZE);
+    msg_init_queue(coap_thread_msg_queue, COAP_MSG_QUEUE_SIZE);
     sock = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
 
     /* parse port */
@@ -213,10 +207,12 @@ void *coap_server(void *arg)
 /**
  * @brief start udp receiver thread
  */
-void coap_start_server(void)
+int coap_start_thread(void)
 {
-    thread_create(coap_server_stack, sizeof(coap_server_stack),
-                    THREAD_PRIORITY_MAIN, THREAD_CREATE_STACKTEST,
-                    coap_server, NULL, "coap_server");
-    puts(". started COAP server...");
+    // init coap endpoints
+    setup_endpoints();
+    // start thread
+    return thread_create(coap_thread_stack, sizeof(coap_thread_stack),
+                         THREAD_PRIORITY_MAIN, THREAD_CREATE_STACKTEST,
+                         coap_thread, NULL, "coap_thread");
 }

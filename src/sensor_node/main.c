@@ -12,10 +12,12 @@
 #include "periph/gpio.h"
 #include "shell.h"
 
-extern int coap_cmd(int argc, char **argv);
-extern void coap_start_server(void);
-extern void coap_setup_endpoints(void);
+//extern int coap_cmd(int argc, char **argv);
+extern int sensor_start_thread(void);
+extern int coap_start_thread(void);
 
+int sensor_pid = -1;
+int coap_pid = -1;
 // array with available shell commands
 static const shell_command_t shell_commands[] = {
 //    { "coap", "send COAP request", coap_cmd },
@@ -36,10 +38,10 @@ int main(void)
     printf("This board features a(n) %s MCU.\n", RIOT_MCU);
     puts("================");
 
-    // init coap endpoints
-    coap_setup_endpoints();
+    // start sensor loop
+    sensor_pid = sensor_start_thread();
     // start coap receiver
-    coap_start_server();
+    coap_pid = coap_start_thread();
 
     // start shell
     puts("All up, running the shell now");

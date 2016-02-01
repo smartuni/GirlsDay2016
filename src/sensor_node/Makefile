@@ -22,6 +22,9 @@ USEMODULE += posix_sockets
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
+USEMODULE += xtimer
+# Add sensor modules
+USEMODULE += hdc1000
 
 # add pkg for microcoap
 USEPKG += microcoap
