@@ -27,15 +27,14 @@
  #define LED_TOGGLE  LED_RED_TOGGLE
  #endif
 
- // parameters
- #define COAP_BUF_SIZE         (63)
- #define COAP_PORT             (5683)
- #define COAP_MSG_QUEUE_SIZE   (8U)
- #define COAP_REPSONSE_LENGTH   (1500)
+// parameters
+#define COAP_BUF_SIZE           (63)
+#define COAP_PORT               (5683)
+#define COAP_MSG_QUEUE_SIZE     (8U)
+#define COAP_REPSONSE_LENGTH    (1500)
 
 static char coap_thread_stack[THREAD_STACKSIZE_DEFAULT];
 static msg_t coap_thread_msg_queue[COAP_MSG_QUEUE_SIZE];
-static char led = '0';
 static char endpoints_response[COAP_REPSONSE_LENGTH] = "";
 
 static const coap_endpoint_path_t path_well_known_core = {2, {".well-known", "core"}};
@@ -65,21 +64,15 @@ static int handle_get_temperature(coap_rw_buffer_t *scratch, const coap_packet_t
 static const coap_endpoint_path_t path_led = {1, {"led"}};
 static int handle_put_led(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt, uint8_t id_hi, uint8_t id_lo)
 {
-    if (inpkt->payload.len == 0)
-        return coap_make_response(scratch, outpkt, NULL, 0, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_BAD_REQUEST, COAP_CONTENTTYPE_TEXT_PLAIN);
-    if (inpkt->payload.p[0] == '1')
-    {
-        led = '1';
+    if (inpkt->payload.p[0] == '1') {
         LED_ON;
         puts("LED ON");
-        return coap_make_response(scratch, outpkt, (const uint8_t *)&led, 1, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CHANGED, COAP_CONTENTTYPE_TEXT_PLAIN);
+        return coap_make_response(scratch, outpkt, (const uint8_t *)&inpkt->payload.p[0], 1, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CHANGED, COAP_CONTENTTYPE_TEXT_PLAIN);
     }
-    else
-    {
-        led = '0';
+    else {
         LED_OFF;
         puts("LED OFF");
-        return coap_make_response(scratch, outpkt, (const uint8_t *)&led, 1, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CHANGED, COAP_CONTENTTYPE_TEXT_PLAIN);
+        return coap_make_response(scratch, outpkt, (const uint8_t *)&inpkt->payload.p[0], 1, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CHANGED, COAP_CONTENTTYPE_TEXT_PLAIN);
     }
 }
 
@@ -89,11 +82,12 @@ const coap_endpoint_t endpoints[] =
     {COAP_METHOD_GET, handle_get_humidity, &path_humidity, "ct=0"},
     {COAP_METHOD_GET, handle_get_temperature, &path_temperature, "ct=0"},
     {COAP_METHOD_PUT, handle_put_led, &path_led, NULL},
-//    {COAP_RSPCODE_CONTENT, handle_response, &path_led, NULL},
-//    {COAP_RSPCODE_CONTENT, handle_response, &path_well_known_core, NULL},
     {(coap_method_t)0, NULL, NULL, NULL}
 };
 
+/**
+ * @brief generate well known resource description
+ */
 static void setup_endpoints(void)
 {
     uint16_t len = COAP_REPSONSE_LENGTH;
@@ -158,20 +152,20 @@ static void *coap_thread(void *arg)
     /* parse port */
     port = (uint16_t)COAP_PORT;
     if (port == 0) {
-        puts("Error: invalid port specified");
+        puts("ERROR: invalid port specified");
         return NULL;
     }
     server_addr.sin6_family = AF_INET6;
     memset(&server_addr.sin6_addr, 0, sizeof(server_addr.sin6_addr));
     server_addr.sin6_port = htons(port);
     if (sock < 0) {
-        puts("error initializing socket");
+        puts("ERROR: initializing socket");
         sock = 0;
         return NULL;
     }
     if (bind(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
         sock = -1;
-        puts("error binding socket");
+        puts("ERROR: binding socket");
         return NULL;
     }
     while (1) {
@@ -182,14 +176,14 @@ static void *coap_thread(void *arg)
         // blocking receive, waiting for data
         if ((res = recvfrom(sock, buf, sizeof(buf), 0,
                             (struct sockaddr *)&src, &src_len)) < 0) {
-            puts("Error on receive");
+            puts("ERROR: on receive");
         }
         else if (res == 0) {
-            puts("Peer did shut down");
+            puts("WARN: Peer did shut down");
         }
         else { // check for PING or PONG
             if (0 != (rc = coap_parse(&pkt, buf, res)))
-                printf("Bad packet rc=%d\n", rc);
+                printf("WARN: Bad packet rc=%d\n", rc);
             else
             {
                 inet_ntop(AF_INET6, &(src.sin6_addr),
@@ -200,7 +194,7 @@ static void *coap_thread(void *arg)
                 coap_handle_req(&scratch_buf, &pkt, &rsppkt);
 
                 if (0 != (rc = coap_build(buf, &rsplen, &rsppkt))) {
-                    printf("coap_build failed rc=%d\n", rc);
+                    printf("WARN: coap_build failed rc=%d\n", rc);
                 }
                 else {
                     sendto(sock, buf, rsplen, 0, (struct sockaddr *)&src, src_len);
@@ -208,12 +202,13 @@ static void *coap_thread(void *arg)
             }
         }
     }
-
     return NULL;
 }
 
 /**
  * @brief start udp receiver thread
+ *
+ * @return PID of coap thread
  */
 int coap_start_thread(void)
 {
