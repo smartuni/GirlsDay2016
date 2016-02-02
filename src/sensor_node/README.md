@@ -6,8 +6,8 @@ This code provides a simple sensor node that will response to COAP request send
 via 6lowpan using IEEE 802.15.4. The sensor nodes are based on the RIOT-OS and
 currently support only the Phytec board, namely `pba-d-01-kw2x` - see RIOT [Wiki](https://github.com/RIOT-OS/RIOT/wiki/Board%3A-Phytec-phyWAVE-KW22), too.
 Currently it supports COAP requests for:
-* GET /temperature ; in degree Celsius, with factor 100
-* GET /humidity ; in percent, with factor 100
+* GET /temperature ; returns temperature in degree Celsius
+* GET /humidity ; returns humidity in percent
 * PUT /led {0|1} ; 1 = on, 0 or anything else = off
 
 ## requirements
