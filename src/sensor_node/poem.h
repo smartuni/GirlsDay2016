@@ -5,8 +5,8 @@
 
  #ifndef POEM_H_
  #define POEM_H_ 1
- 
-char* poem[] = {
+
+const char* poem[] = {
     "Der Erlrouter",
     "Wer routet so spaet durch Nacht und Wind?",
     "Es ist der Router, er routet geschwind!",
@@ -58,5 +58,5 @@ char* poem[] = {
     "durch helle und funkelnde Lichtwellenleiter."
 };
 
-size_t poem_len = 49;
+const size_t poem_len = sizeof(poem)/sizeof(char*);
 #endif // POEM_H_

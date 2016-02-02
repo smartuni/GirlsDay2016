@@ -40,8 +40,8 @@ int sensor_pid = -1;
 int coap_pid = -1;
 int shell_poem_cnt = 0;
 
-extern char* poem[];
-extern size_t poem_len;
+extern const char* poem[];
+extern const size_t poem_len;
 
 //extern int coap_cmd(int argc, char **argv);
 extern int sensor_start_thread(void);
@@ -137,7 +137,7 @@ int cmd_get(int argc, char **argv)
             puts("ERROR: unknown poem request!");
             return (1);
         }
-        printf("(%02d)\t %s)", l, poem[l]);
+        printf("(%02d)\t %s\n", l, poem[l]);
     }
     else {
         puts ("[WARN] unknown sensor value requested.");
