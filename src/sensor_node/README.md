@@ -3,7 +3,9 @@
 ## introduction
 
 This code provides a simple sensor node that will response to COAP request send
-via 6lowpan using IEEE 802.15.4. Currently it supports COAP requests for:
+via 6lowpan using IEEE 802.15.4. The sensor nodes are based on the RIOT-OS and
+currently support only the Phytec board, namely `pba-d-01-kw2x` - see RIOT [Wiki](https://github.com/RIOT-OS/RIOT/wiki/Board%3A-Phytec-phyWAVE-KW22), too.
+Currently it supports COAP requests for:
 * GET /temperature ; in degree Celsius, with factor 100
 * GET /humidity ; in percent, with factor 100
 * PUT /led {0|1} ; 1 = on, 0 or anything else = off
@@ -21,8 +23,7 @@ That's all, you are all set and good to go ...
 
 ## build
 
-The sensor nodes are based on the RIOT-OS and currently support only the Phytec
-board, namely `pba-d-01-kw2x`. To compile the source code set `RIOTBASE`, `PORT`,
+To compile the source code set `RIOTBASE`, `PORT`,
 and `PATH` environment variables according to your system and run `make` afterwards:
 
 ```
@@ -45,4 +46,4 @@ node. See _introduction_ above for currently supported request.
 For _debugging_ the nodes also allow for shell access, that is connect to the node
 via `make term` and you get a shell. Besides `get` and `put` you can also get
 information on the network interface settings using `ifconfig` - or type `help`
-for further shell commands. 
+for further shell commands.
