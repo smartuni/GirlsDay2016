@@ -1,0 +1,9 @@
+Setup for standard raspian installation
+---
+Python and Dependencies:
+    sudo apt-get install python3 , python3-setuptools
+    sudo easy_install3 aiocoap
+    
+Geany IDE:
+    sudo apt-get install geany, geany-plugin-multiterm
+    in Geany: Build → Set build command → build and execute to python3    
