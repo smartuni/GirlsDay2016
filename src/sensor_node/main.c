@@ -137,7 +137,7 @@ int cmd_get(int argc, char **argv)
             puts("ERROR: unknown poem request!");
             return (1);
         }
-        printf("(%02d)\t %s\n", l, poem[l]);
+        printf("%02d  %s\n", l, poem[l]);
     }
     else {
         puts ("[WARN] unknown sensor value requested.");

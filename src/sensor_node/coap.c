@@ -66,9 +66,15 @@ static int handle_get_well_known_core(coap_rw_buffer_t *scratch, const coap_pack
  */
 static int handle_get_humidity(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt, uint8_t id_hi, uint8_t id_lo)
 {
-    int h = sensor_get_humidity();
+    int h100 = sensor_get_humidity();
+    int rest = h100 % 100;
     char bufstr[COAP_BUF_SIZE];
-    sprintf(bufstr, "{sensor: 'humidity',unit: '%%',factor: 100,value: '%d'}", h);
+    if ((inpkt->payload.len > 0) && (strncmp((const char *)inpkt->payload.p,"json",4)==0)) {
+        sprintf(bufstr, "{sensor: 'humidity',unit: '%%',factor: 100,value: '%d'}", h100);
+    }
+    else {
+        sprintf(bufstr, "%d.%02d %%", h100/100, rest);
+    }
     return coap_make_response(scratch, outpkt, (const uint8_t *)bufstr, strlen(bufstr), id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT, COAP_CONTENTTYPE_TEXT_PLAIN);
 }
 
@@ -77,9 +83,15 @@ static int handle_get_humidity(coap_rw_buffer_t *scratch, const coap_packet_t *i
  */
 static int handle_get_temperature(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt, uint8_t id_hi, uint8_t id_lo)
 {
-    int t = sensor_get_temperature();
+    int t100 = sensor_get_temperature();
+    int rest = t100 % 100;
     char bufstr[COAP_BUF_SIZE];
-    sprintf(bufstr, "{sensor: 'temperature',unit: 'C',factor: 100,value: '%d'}", t);
+    if ((inpkt->payload.len > 0) && (strncmp((const char *)inpkt->payload.p,"json",4)==0)) {
+        sprintf(bufstr, "{sensor: 'temperature',unit: 'C',factor: 100,value: '%d'}", t100);
+    }
+    else {
+        sprintf(bufstr, "%d.%02d C", t100/100, rest);
+    }
     return coap_make_response(scratch, outpkt, (const uint8_t *)bufstr, strlen(bufstr), id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT, COAP_CONTENTTYPE_TEXT_PLAIN);
 }
 
@@ -92,13 +104,12 @@ static int handle_get_poem(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt
     int l = 0;
     if (inpkt->payload.len > 0) {
         l = atoi((const char*)inpkt->payload.p) % poem_len;
-        sprintf(bufstr, "{line: '%d',value: '%s'}", l, poem[l]);
     }
     else {
         l = poem_cnt % poem_len;
-        sprintf(bufstr, "{line: '%d',value: '%s'}", l, poem[l]);
         ++poem_cnt;
     }
+    sprintf(bufstr, "%02d  %s", l, poem[l]);
     return coap_make_response(scratch, outpkt, (const uint8_t *)bufstr, strlen(bufstr), id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT, COAP_CONTENTTYPE_TEXT_PLAIN);
 }
 /**
