@@ -9,7 +9,7 @@
  *
  * @}
  */
- 
+
 // standard
  #include <inttypes.h>
  #include <stdio.h>
@@ -23,6 +23,7 @@
 #include "periph/gpio.h"
 #include "shell.h"
 // own
+//#include "poem.h"
 #include "sensor.h"
 
 #define COMM_PAN           (0x2804) // lowpan ID
@@ -37,6 +38,10 @@
 
 int sensor_pid = -1;
 int coap_pid = -1;
+int shell_poem_cnt = 0;
+
+extern char* poem[];
+extern size_t poem_len;
 
 //extern int coap_cmd(int argc, char **argv);
 extern int sensor_start_thread(void);
@@ -118,6 +123,21 @@ int cmd_get(int argc, char **argv)
         int h100 = sensor_get_humidity();
         int rest = h100 % 100;
         printf("Humidity: %d.%02d %%\n", h100/100, rest);
+    }
+    else if ((argc >= 2) &&(strncmp(argv[1],"poem",4) == 0)) {
+        int l = 0;
+        if (argc == 2) {
+            l = shell_poem_cnt % poem_len;
+            ++shell_poem_cnt;
+        }
+        else if (argc == 3) {
+            l = atoi(argv[2]) % poem_len;
+        }
+        else {
+            puts("ERROR: unknown poem request!");
+            return (1);
+        }
+        printf("(%02d)\t %s)", l, poem[l]);
     }
     else {
         puts ("[WARN] unknown sensor value requested.");
