@@ -73,7 +73,7 @@ static int handle_get_humidity(coap_rw_buffer_t *scratch, const coap_packet_t *i
         sprintf(bufstr, "{sensor: 'humidity',unit: '%%',factor: 100,value: '%d'}", h100);
     }
     else {
-        sprintf(bufstr, "%d.%02d %%", h100/100, rest);
+        sprintf(bufstr, "%d.%02d", h100/100, rest);
     }
     return coap_make_response(scratch, outpkt, (const uint8_t *)bufstr, strlen(bufstr), id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT, COAP_CONTENTTYPE_TEXT_PLAIN);
 }
@@ -90,7 +90,7 @@ static int handle_get_temperature(coap_rw_buffer_t *scratch, const coap_packet_t
         sprintf(bufstr, "{sensor: 'temperature',unit: 'C',factor: 100,value: '%d'}", t100);
     }
     else {
-        sprintf(bufstr, "%d.%02d C", t100/100, rest);
+        sprintf(bufstr, "%d.%02d", t100/100, rest);
     }
     return coap_make_response(scratch, outpkt, (const uint8_t *)bufstr, strlen(bufstr), id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT, COAP_CONTENTTYPE_TEXT_PLAIN);
 }
