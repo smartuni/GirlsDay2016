@@ -57,7 +57,7 @@ static const shell_command_t shell_commands[] = {
     { NULL, NULL, NULL }
 };
 
-static void comm_init(void)
+static int comm_init(void)
 {
     kernel_pid_t ifs[GNRC_NETIF_NUMOF];
     uint16_t pan = COMM_PAN;
@@ -65,13 +65,14 @@ static void comm_init(void)
 
     /* get the PID of the first radio */
     if (gnrc_netif_get(ifs) <= 0) {
-        puts("comm: ERROR during init, not radio found!\n");
-        return;
+        puts("ERROR: comm init, not radio found!\n");
+        return (-1);
     }
 
     /* initialize the radio */
     gnrc_netapi_set(ifs[0], NETOPT_NID, 0, &pan, 2);
     gnrc_netapi_set(ifs[0], NETOPT_CHANNEL, 0, &chan, 2);
+    return 0;
 }
 
 /**
@@ -90,11 +91,16 @@ int main(void)
 
     // init 6lowpan interface
     puts(". init network");
-    comm_init();
+    if (comm_init()!=0) {
+        return 1;
+    }
     puts(".");
     // start sensor loop
     puts(".. init sensors");
     sensor_pid = sensor_start_thread();
+    if (sensor_pid < 0) {
+        return 1;
+    }
     puts(":");
     // start coap receiver
     puts("... init coap");
@@ -123,6 +129,11 @@ int cmd_get(int argc, char **argv)
         int h100 = sensor_get_humidity();
         int rest = h100 % 100;
         printf("Humidity: %d.%02d %%\n", h100/100, rest);
+    }
+    else if ((argc == 2) && (strncmp(argv[1],"airquality",3) == 0)) {
+        int a100 = sensor_get_airquality();
+        int rest = a100 % 100;
+        printf("AirQuality: %d.%02d %%\n", a100/100, rest);
     }
     else if ((argc >= 2) &&(strncmp(argv[1],"poem",4) == 0)) {
         int l = 0;
