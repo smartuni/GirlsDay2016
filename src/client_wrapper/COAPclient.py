@@ -19,15 +19,15 @@ def __request(uri, myMessage, method):
 	except Exception as e:
 		print('Failed to fetch resource:')
 		print(e)
-	else:
-		print('Result: %s\n%r'%(response.code, response.payload))
+	#else:
+		#print('Result: %s\n%r'%(response.code, response.payload))
 	return response.payload
 	
 
 #"coap://localhost/hello"
-def get(uri):
+def get(uri, message=""):
 	logging.debug("started GET method with uri: "+uri)
-	response=asyncio.get_event_loop().run_until_complete(__request(uri, "" , GET))
+	response=asyncio.get_event_loop().run_until_complete(__request(uri, message , GET))
 	return response
 
 def post(uri, message):
