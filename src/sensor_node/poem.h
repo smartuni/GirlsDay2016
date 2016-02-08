@@ -55,7 +55,25 @@ const char* poem[] = {
     "Mein Paeckchen, den Kopf hoch, Du musst nicht verzagen,",
     "an Dich wird sich niemals ein Bitfehler wagen.",
     "Schnell wie der Wind geht die Reise nun weiter",
-    "durch helle und funkelnde Lichtwellenleiter."
+    "durch helle und funkelnde Lichtwellenleiter.",
+    "Mein Paeckchen, mein Paeckchen, willst Du mit mir gehen?",
+    "Die Wunder des Frame-Relay-Netzes ansehen?",
+    "Mein Router, mein Router, ja hoerst Du denn nicht,",
+    "was die WAN-Wolke lockend mir leise verspricht?",
+    "Glaub mir, mein Paeckchen, im LAN, da entgeht",
+    "Dir sowieso Lebens- und Dienstqualitaet.",
+    "Reise nur weiter ganz ruhig und sacht",
+    "Quer durchs ATM-Netz mit FRF.8 .",
+    "Mein Router, mein Router, man hat mich verfuehrt,",
+    "zerlegt, verschaltet und rekombiniert!",
+    "Mein Paeckchen, das macht nichts, nun sparen wir viel,",
+    "ein VPN-Tunnel, der bringt Dich ans Ziel.",
+    "DiffSERV und TOS-Feld, merk' Dir die Worte,",
+    "die oeffnen zu jedem Router die Pforte.",
+    "Finster der Tunnel, die Bandbreite knapp,",
+    "wie schoen war die Backplane im eigenen Hub.",
+    "Am Ende des Tunnels: Das Paeckchen ist weg,",
+    "vernichtet vom Cyclic Redundancy Check."
 };
 
 const size_t poem_len = sizeof(poem)/sizeof(char*);

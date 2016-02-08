@@ -14,7 +14,7 @@ BOARD_WHITELIST := pba-d-01-kw2x
 USEMODULE += gnrc_netif_default
 USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules for IPv6 and UDP
-USEMODULE += gnrc_ipv6_default
+USEMODULE += gnrc_ipv6_router_default
 USEMODULE += gnrc_udp
 USEMODULE += gnrc_conn_udp
 USEMODULE += posix_sockets

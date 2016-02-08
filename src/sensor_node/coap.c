@@ -48,6 +48,7 @@ static char endpoints_response[COAP_REPSONSE_LENGTH] = "";
 static int poem_cnt = 0;
 
 static const coap_endpoint_path_t path_well_known_core = {2, {".well-known", "core"}};
+static const coap_endpoint_path_t path_airquality = {1, {"airquality"}};
 static const coap_endpoint_path_t path_humidity = {1, {"humidity"}};
 static const coap_endpoint_path_t path_led = {1, {"led"}};
 static const coap_endpoint_path_t path_poem = {1, {"poem"}};
@@ -62,13 +63,36 @@ static int handle_get_well_known_core(coap_rw_buffer_t *scratch, const coap_pack
 }
 
 /**
+ * @brief handle get airquality request
+ */
+static int handle_get_airquality(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt, uint8_t id_hi, uint8_t id_lo)
+{
+    int a100 = sensor_get_airquality();
+    int rest = a100 % 100;
+    char bufstr[COAP_BUF_SIZE];
+    if ((inpkt->payload.len > 0) && (strncmp((const char *)inpkt->payload.p,"json",4)==0)) {
+        sprintf(bufstr, "{sensor: 'airquality',unit: '%%',factor: 100,value: '%d'}", a100);
+    }
+    else {
+        sprintf(bufstr, "%d.%02d", a100/100, rest);
+    }
+    return coap_make_response(scratch, outpkt, (const uint8_t *)bufstr, strlen(bufstr), id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT, COAP_CONTENTTYPE_TEXT_PLAIN);
+}
+
+/**
  * @brief handle get humidity request
  */
 static int handle_get_humidity(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt, uint8_t id_hi, uint8_t id_lo)
 {
-    int h = sensor_get_humidity();
+    int h100 = sensor_get_humidity();
+    int rest = h100 % 100;
     char bufstr[COAP_BUF_SIZE];
-    sprintf(bufstr, "{sensor: 'humidity',unit: '%%',factor: 100,value: '%d'}", h);
+    if ((inpkt->payload.len > 0) && (strncmp((const char *)inpkt->payload.p,"json",4)==0)) {
+        sprintf(bufstr, "{sensor: 'humidity',unit: '%%',factor: 100,value: '%d'}", h100);
+    }
+    else {
+        sprintf(bufstr, "%d.%02d", h100/100, rest);
+    }
     return coap_make_response(scratch, outpkt, (const uint8_t *)bufstr, strlen(bufstr), id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT, COAP_CONTENTTYPE_TEXT_PLAIN);
 }
 
@@ -77,9 +101,15 @@ static int handle_get_humidity(coap_rw_buffer_t *scratch, const coap_packet_t *i
  */
 static int handle_get_temperature(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt, uint8_t id_hi, uint8_t id_lo)
 {
-    int t = sensor_get_temperature();
+    int t100 = sensor_get_temperature();
+    int rest = t100 % 100;
     char bufstr[COAP_BUF_SIZE];
-    sprintf(bufstr, "{sensor: 'temperature',unit: 'C',factor: 100,value: '%d'}", t);
+    if ((inpkt->payload.len > 0) && (strncmp((const char *)inpkt->payload.p,"json",4)==0)) {
+        sprintf(bufstr, "{sensor: 'temperature',unit: 'C',factor: 100,value: '%d'}", t100);
+    }
+    else {
+        sprintf(bufstr, "%d.%02d", t100/100, rest);
+    }
     return coap_make_response(scratch, outpkt, (const uint8_t *)bufstr, strlen(bufstr), id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT, COAP_CONTENTTYPE_TEXT_PLAIN);
 }
 
@@ -92,13 +122,12 @@ static int handle_get_poem(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt
     int l = 0;
     if (inpkt->payload.len > 0) {
         l = atoi((const char*)inpkt->payload.p) % poem_len;
-        sprintf(bufstr, "{line: '%d',value: '%s'}", l, poem[l]);
     }
     else {
         l = poem_cnt % poem_len;
-        sprintf(bufstr, "{line: '%d',value: '%s'}", l, poem[l]);
         ++poem_cnt;
     }
+    sprintf(bufstr, "%02d  %s", l, poem[l]);
     return coap_make_response(scratch, outpkt, (const uint8_t *)bufstr, strlen(bufstr), id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT, COAP_CONTENTTYPE_TEXT_PLAIN);
 }
 /**
@@ -121,6 +150,7 @@ static int handle_put_led(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt,
 const coap_endpoint_t endpoints[] =
 {
     {COAP_METHOD_GET, handle_get_well_known_core, &path_well_known_core, "ct=40"},
+    {COAP_METHOD_GET, handle_get_airquality, &path_airquality, "ct=0"},
     {COAP_METHOD_GET, handle_get_humidity, &path_humidity, "ct=0"},
     {COAP_METHOD_GET, handle_get_temperature, &path_temperature, "ct=0"},
     {COAP_METHOD_GET, handle_get_poem, &path_poem, "ct=0"},
