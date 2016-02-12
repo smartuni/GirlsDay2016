@@ -1,5 +1,7 @@
 import asyncio
 import logging
+import signal
+import sys
 from aiocoap import *
 
 logging.basicConfig(level=logging.INFO)
@@ -19,9 +21,9 @@ def __request(uri, myMessage, method):
 	except Exception as e:
 		print('Failed to fetch resource:')
 		print(e)
-	#else:
+	else:
 		#print('Result: %s\n%r'%(response.code, response.payload))
-	return response.payload
+		return response.payload
 	
 
 #"coap://localhost/hello"
@@ -44,6 +46,17 @@ def delete(uri, message):
 	logging.debug("started DELETE method with uri: "+uri)
 	response=asyncio.get_event_loop().run_until_complete(__request(uri, message, DELETE))
 	return response
+	
+# a quick and dirty graceful leave - emptying event loop
+
+def __signal_handler(signal, frame):
+	log.DEBUG('Received SIGINT - deleting event loop now')
+	asyncio.get_event_loop().stop()
+	asyncio.get_event_loop().close()
+	sys.exit(0)
+	
+signal.signal(signal.SIGINT, __signal_handler)
+
 
 
 
