@@ -13,6 +13,7 @@ logging.basicConfig(level=logging.DEBUG)
 mVal=50
 mMax=100
 mMin=0
+countdownSec=10
 
 l=threading.Lock()
 
@@ -40,7 +41,8 @@ def chVal( blub ):
 	
 			
 
-
+def countdown(dt):
+	chVal(-10)
 		
 
 
@@ -87,6 +89,7 @@ class Plant_server(aiocoap.resource.Resource):
 		return aiocoap.Message(code=aiocoap.CONTENT, payload=payload)
 
 def main():
+	pyglet.clock.schedule_interval(countdown, countdownSec)
 	t=threading.Thread(target=pyglet.app.run)
 	t.daemon=True
 	t.start()
