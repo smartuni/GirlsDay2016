@@ -17,7 +17,6 @@
  #include <string.h>
 // riot
 #include "board.h"
-#include "kernel.h"
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netif.h"
 #include "periph/gpio.h"
@@ -31,9 +30,9 @@
 
 // compatibility
 #ifndef LED_ON
-#define LED_ON      LED_RED_ON
-#define LED_OFF     LED_RED_OFF
-#define LED_TOGGLE  LED_RED_TOGGLE
+#define LED_ON      LED0_ON
+#define LED_OFF     LED0_OFF
+#define LED_TOGGLE  LED0_TOGGLE
 #endif
 
 int sensor_pid = -1;

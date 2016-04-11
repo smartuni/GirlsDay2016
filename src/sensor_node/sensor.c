@@ -20,10 +20,6 @@
 // own
 #include "sensor.h"
 
-#if ADC_NUMOF < 1
-#error "No ADC device found!"
-#endif
-
 static hdc1000_t hdcDev;
 
 static int samples_airquality[SENSOR_NUM_SAMPLES];
@@ -103,7 +99,7 @@ static void sensor_hdc1000_measure(int *temp, int *hum) {
  */
 int sensor_mq135_measure(void){
     int airQuality = 0;
-    airQuality = adc_sample(0, 2);
+    airQuality = adc_sample(ADC_LINE(0), ADC_RES_16BIT);
     // do some scaling and processing here?
     //printf("[sensors] raw mq135 sample %d\n", airQuality);
     return airQuality;
@@ -115,11 +111,15 @@ int sensor_mq135_measure(void){
  * @return 0 on success, anything else on error
  */
 static int sensor_init(void) {
+    if (ADC_NUMOF < 1) {
+        puts("ERROR: no ADC device found");
+        return (-1);
+    }
     // init ADC devices for air quality sensor MQ135
     for (int i = 0; i < ADC_NUMOF; i++) {
         /* initialize ADC device */
         //printf("Initializing ADC_%d @ %d bit resolution", i, (6 + (2* RES)));
-        if (adc_init(i, ADC_RES_16BIT) != 0) {
+        if (adc_init(i) != 0) {
             printf("ERROR: init ADC_%d!\n", i);
             return (-1);
         }
