@@ -9,10 +9,11 @@ import matplotlib as mpl
 mpl.use("pdf")
 import matplotlib.pyplot as plt
 import numpy
+from matplotlib.ticker import FormatStrFormatter
 
 max_samples = 32
 host_uri = "[fe80::f353:4e59:71ba:600a%lowpan0]"
-pp = PdfPages('sensordata.pdf')
+yFormatter = FormatStrFormatter('%.2f')
 
 @asyncio.coroutine
 def main():
@@ -53,22 +54,22 @@ def main():
             print('Temperatur: %2.2f, Humitdy: %2.2f, AirQuality: %2.2f' %(t_temp, t_humi, t_airq))
             pos = (pos + 1) % max_samples
             if pos == 0:
-                plt.subplot(3, 1, 1)
-                plt.plot(samples['temperature'])
-                plt.title('Sensor data')
-                plt.ylabel('temperature')
-                plt.ylim([0,50])
+                fig = plt.figure()
+                ax = fig.add_subplot(311)
+                ax.plot(samples['temperature'])
+                ax.set_title('Sensor data')
+                ax.yaxis.set_major_formatter(FormatStrFormatter('%0.0f'))
+                ax.set_ylabel('temperature')
 
-                plt.subplot(3, 1, 2)
-                plt.plot(samples['humidity'])
-                plt.ylabel('humidity')
-                plt.ylim([0,100])
+                ay = fig.add_subplot(312)
+                ay.plot(samples['humidity'])
+                ay.set_ylabel('humidity')
 
-                plt.subplot(3, 1, 3)
-                plt.plot(samples['airquality'])
-                plt.xlabel('time (s)')
-                plt.ylabel('AirQuality')
-                plt.ylim([0,100])
+                az = fig.add_subplot(313)
+                az.plot(samples['airquality'])
+                az.set_xlabel('time (s)')
+                az.set_ylabel('AirQuality')
+
                 plt.savefig('sensordata_'+str(cnt)+'.pdf')
                 cnt += 1
         time.sleep(1)
