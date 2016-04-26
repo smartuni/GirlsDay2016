@@ -100,6 +100,9 @@ int main(void)
     if (sensor_pid < 0) {
         return 1;
     }
+    LED0_OFF;
+    LED1_OFF;
+    LED2_OFF;
     puts(":");
     // start coap receiver
     puts("... init coap");
