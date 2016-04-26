@@ -5,8 +5,9 @@ from aiocoap import *
 import asyncio
 import time
 # plot stuff
+import matplotlib as mpl
+mpl.use("pdf")
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
 import numpy
 
 max_samples = 32
