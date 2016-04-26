@@ -163,10 +163,23 @@ int cmd_put(int argc, char **argv)
 {
     if ((argc == 3) && (strcmp(argv[1],"led") == 0)) {
         if (strcmp(argv[2], "1") == 0) {
-            LED_ON;
+            LED0_ON;
+            LED1_ON;
+            LED2_ON;
+        }
+        else if (strcmp(argv[2], "r") == 0) {
+            LED0_TOGGLE;
+        }
+        else if (strcmp(argv[2], "g") == 0) {
+            LED1_TOGGLE;
+        }
+        else if (strcmp(argv[2], "b") == 0) {
+            LED2_TOGGLE;
         }
         else {
-            LED_OFF;
+            LED0_OFF;
+            LED1_OFF;
+            LED2_OFF;
         }
     }
     else {
