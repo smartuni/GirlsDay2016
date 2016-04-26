@@ -135,15 +135,37 @@ static int handle_get_poem(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt
  */
 static int handle_put_led(coap_rw_buffer_t *scratch, const coap_packet_t *inpkt, coap_packet_t *outpkt, uint8_t id_hi, uint8_t id_lo)
 {
-    if ((inpkt->payload.len > 0) && (inpkt->payload.p[0] == '1')) {
-        LED_ON;
-        puts("LED ON");
-        return coap_make_response(scratch, outpkt, (const uint8_t *)&inpkt->payload.p[0], 1, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CHANGED, COAP_CONTENTTYPE_TEXT_PLAIN);
+    if (inpkt->payload.len > 0) {
+        if (inpkt->payload.p[0] == '1') {
+            LED0_ON;
+            LED1_ON;
+            LED2_ON;
+            puts("LED ON!");
+        }
+        else if (inpkt->payload.p[0] == 'r') {
+            LED0_TOGGLE;
+            puts("LED TOGGLE red ...");
+        }
+        else if (inpkt->payload.p[0] == 'g') {
+            LED1_TOGGLE;
+            puts("LED TOGGLE green ...");
+        }
+        else if (inpkt->payload.p[0] == 'b') {
+            LED2_TOGGLE;
+            puts("LED TOGGLE blue ...");
+        }
+        else {
+            LED0_OFF;
+            LED1_OFF;
+            LED2_OFF;
+            puts("LED OFF!");
+        }
+        return coap_make_response(scratch, outpkt, NULL, 0, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CHANGED, COAP_CONTENTTYPE_TEXT_PLAIN);
     }
     else {
         LED_OFF;
         puts("LED OFF");
-        return coap_make_response(scratch, outpkt, (const uint8_t *)&inpkt->payload.p[0], 1, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CHANGED, COAP_CONTENTTYPE_TEXT_PLAIN);
+        return coap_make_response(scratch, outpkt, NULL, 0, id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_BAD_REQUEST, COAP_CONTENTTYPE_TEXT_PLAIN);
     }
 }
 
