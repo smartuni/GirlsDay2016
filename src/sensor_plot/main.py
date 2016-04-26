@@ -68,7 +68,7 @@ def main():
                 plt.xlabel('time (s)')
                 plt.ylabel('AirQuality')
                 plt.ylim([0,100])
-                plt.savefig('sensordata_'+cnt+'.pdf')
+                plt.savefig('sensordata_'+str(cnt)+'.pdf')
                 cnt += 1
         time.sleep(1)
 
