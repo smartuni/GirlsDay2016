@@ -26,6 +26,7 @@ def main():
         samples['airquality'].append(0)
 
     pos = 0
+    cnt = 0
     while True:
         req_temperature = Message(code=GET)
         req_humidity = Message(code=GET)
@@ -55,17 +56,20 @@ def main():
                 plt.plot(samples['temperature'])
                 plt.title('Sensor data')
                 plt.ylabel('temperature')
+                plt.ylim([0,50])
 
                 plt.subplot(3, 1, 2)
                 plt.plot(samples['humidity'])
                 plt.ylabel('humidity')
+                plt.ylim([0,100])
 
                 plt.subplot(3, 1, 3)
                 plt.plot(samples['airquality'])
                 plt.xlabel('time (s)')
                 plt.ylabel('AirQuality')
-                pp.savefig()
-                pp.close()
+                plt.ylim([0,100])
+                plt.savefig('sensordata_'+cnt+'.pdf')
+                cnt += 1
         time.sleep(1)
 
 if __name__ == "__main__":
