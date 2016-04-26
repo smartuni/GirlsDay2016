@@ -58,17 +58,19 @@ def main():
                 ax = fig.add_subplot(311)
                 ax.plot(samples['temperature'])
                 ax.set_title('Sensor data')
-                ax.yaxis.set_major_formatter(FormatStrFormatter('%0.0f'))
+                ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
                 ax.set_ylabel('temperature')
 
                 ay = fig.add_subplot(312)
                 ay.plot(samples['humidity'])
                 ay.set_ylabel('humidity')
+                ay.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
 
                 az = fig.add_subplot(313)
                 az.plot(samples['airquality'])
                 az.set_xlabel('time (s)')
                 az.set_ylabel('AirQuality')
+                az.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
 
                 plt.savefig('sensordata_'+str(cnt)+'.pdf')
                 cnt += 1
