@@ -1,22 +1,29 @@
 #!/usr/bin/env python3
 
+# coap stuff
 from aiocoap import *
 import asyncio
 import time
+# plot stuff
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
+import numpy
 
-host_uri = "[fe80::f353:4e59:71ba:600a%lowpan0]"
 max_samples = 32
+host_uri = "[fe80::f353:4e59:71ba:600a%lowpan0]"
+pp = PdfPages('sensordata.pdf')
+
 @asyncio.coroutine
 def main():
     protocol = yield from Context.create_client_context()
     samples = dict()
     samples['temperature'] = list()
     samples['humidity'] = list()
-    sampels['airquality'] = list()
+    samples['airquality'] = list()
     for i in range(0,max_samples):
         samples['temperature'].append(0)
         samples['humidity'].append(0)
-        sampels['airquality'].append(0)
+        samples['airquality'].append(0)
 
     pos = 0
     while True:
@@ -40,9 +47,25 @@ def main():
             t_airq = float(res_airquality.payload.decode('utf-8'))
             samples['temperature'][pos] = t_temp
             samples['humidity'][pos] = t_humi
-            sampels['airquality'][pos] t_airq
-            print('Temperatur: %f, Humitdy: %f, AirQuality: %f' %(t_temp, t_humi, t_airq)
+            samples['airquality'][pos] = t_airq
+            print('Temperatur: %2.2f, Humitdy: %2.2f, AirQuality: %2.2f' %(t_temp, t_humi, t_airq))
             pos = (pos + 1) % max_samples
+            if pos == 0:
+                plt.subplot(3, 1, 1)
+                plt.plot(samples['temperature'])
+                plt.title('Sensor data')
+                plt.ylabel('temperature')
+
+                plt.subplot(3, 1, 2)
+                plt.plot(samples['humidity'])
+                plt.ylabel('humidity')
+
+                plt.subplot(3, 1, 3)
+                plt.plot(samples['airquality'])
+                plt.xlabel('time (s)')
+                plt.ylabel('AirQuality')
+                pp.savefig()
+                pp.close()
         time.sleep(1)
 
 if __name__ == "__main__":
