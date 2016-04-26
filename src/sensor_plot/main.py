@@ -5,11 +5,20 @@ import asyncio
 import time
 
 host_uri = "[fe80::f353:4e59:71ba:600a%lowpan0]"
-
+max_samples = 32
 @asyncio.coroutine
 def main():
     protocol = yield from Context.create_client_context()
+    samples = dict()
+    samples['temperature'] = list()
+    samples['humidity'] = list()
+    sampels['airquality'] = list()
+    for i in range(0,max_samples):
+        samples['temperature'].append(0)
+        samples['humidity'].append(0)
+        sampels['airquality'].append(0)
 
+    pos = 0
     while True:
         req_temperature = Message(code=GET)
         req_humidity = Message(code=GET)
@@ -26,7 +35,14 @@ def main():
             print('Failed to fetch resource:')
             print(e)
         else:
-            print('Temperatur: %s, Humitdy: %s, AirQuality: %s' %(res_temperature.payload.decode('utf-8'), res_humidity.payload.decode('utf-8'), res_airquality.payload.decode('utf-8')))
+            t_temp = float(res_temperature.payload.decode('utf-8'))
+            t_humi = float(res_humidity.payload.decode('utf-8'))
+            t_airq = float(res_airquality.payload.decode('utf-8'))
+            samples['temperature'][pos] = t_temp
+            samples['humidity'][pos] = t_humi
+            sampels['airquality'][pos] t_airq
+            print('Temperatur: %f, Humitdy: %f, AirQuality: %f' %(t_temp, t_humi, t_airq)
+            pos = (pos + 1) % max_samples
         time.sleep(1)
 
 if __name__ == "__main__":
