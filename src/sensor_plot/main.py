@@ -11,9 +11,10 @@ import matplotlib.pyplot as plt
 import numpy
 from matplotlib.ticker import FormatStrFormatter
 
-max_samples = 32
+max_samples = 20
 host_uri = "[fe80::f353:4e59:71ba:600a%lowpan0]"
 yFormatter = FormatStrFormatter('%.2f')
+app_samples = True
 
 @asyncio.coroutine
 def main():
@@ -22,13 +23,13 @@ def main():
     samples['temperature'] = list()
     samples['humidity'] = list()
     samples['airquality'] = list()
-    for i in range(0,max_samples):
-        samples['temperature'].append(0)
-        samples['humidity'].append(0)
-        samples['airquality'].append(0)
+    if not app_samples:
+        for i in range(0,max_samples):
+            samples['temperature'].append(0)
+            samples['humidity'].append(0)
+            samples['airquality'].append(0)
 
     pos = 0
-    cnt = 0
     while True:
         req_temperature = Message(code=GET)
         req_humidity = Message(code=GET)
@@ -48,13 +49,19 @@ def main():
             t_temp = float(res_temperature.payload.decode('utf-8'))
             t_humi = float(res_humidity.payload.decode('utf-8'))
             t_airq = float(res_airquality.payload.decode('utf-8'))
-            samples['temperature'][pos] = t_temp
-            samples['humidity'][pos] = t_humi
-            samples['airquality'][pos] = t_airq
+            if not app_samples:
+                samples['temperature'][pos] = t_temp
+                samples['humidity'][pos] = t_humi
+                samples['airquality'][pos] = t_airq
+            else:
+                samples['temperature'].append(t_temp)
+                samples['humidity'].append(t_humi)
+                samples['airquality'].append(t_airq)
+
             print('Temperatur: %2.2f, Humitdy: %2.2f, AirQuality: %2.2f' %(t_temp, t_humi, t_airq))
             pos = (pos + 1) % max_samples
             if pos == 0:
-                fig = plt.figure(figsize=(8,5))
+                fig = plt.figure(figsize=(12,7))
                 ax = fig.add_subplot(311)
                 ax.plot(samples['temperature'])
                 ax.set_title('Sensor data')
@@ -73,7 +80,6 @@ def main():
                 az.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
 
                 plt.savefig('sensordata.png')
-                cnt += 1
         time.sleep(1)
 
 if __name__ == "__main__":
