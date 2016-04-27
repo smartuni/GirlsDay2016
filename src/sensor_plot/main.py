@@ -37,8 +37,9 @@ def main():
             samples['temperatureB'].append(0)
             samples['humidityB'].append(0)
             samples['airqualityB'].append(0)
-
-    pos = 0
+    if max_samples < 1:
+        return
+    pos = max_samples - 1
     while True:
         req_temperatureA = Message(code=GET)
         req_humidityA = Message(code=GET)
@@ -94,7 +95,7 @@ def main():
                         samples['airqualityB'].append(t_airq)
 
                     print('SensorB -- Temperatur: %2.2f, Humitdy: %2.2f, AirQuality: %2.2f' %(t_temp, t_humi, t_airq))
-        pos = (pos + 1) % max_samples
+        pos = (pos - 1) % max_samples
         if (pos % fig_samples) == 0:
             fig = plt.figure(figsize=(12,7))
             ax = fig.add_subplot(311)
