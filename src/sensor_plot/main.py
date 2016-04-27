@@ -10,6 +10,7 @@ mpl.use("agg")
 import matplotlib.pyplot as plt
 import numpy
 from matplotlib.ticker import FormatStrFormatter
+from collections import deque
 
 max_samples = 100
 fig_samples = 5
@@ -23,21 +24,21 @@ use_sensorB = True
 def main():
     protocol = yield from Context.create_client_context()
     samples = dict()
-    samples['temperatureA'] = list()
-    samples['humidityA'] = list()
-    samples['airqualityA'] = list()
-    samples['temperatureB'] = list()
-    samples['humidityB'] = list()
-    samples['airqualityB'] = list()
+    samples['temperatureA'] = deque()
+    samples['humidityA'] = deque()
+    samples['airqualityA'] = deque()
+    samples['temperatureB'] = deque()
+    samples['humidityB'] = deque()
+    samples['airqualityB'] = deque()
     if not app_samples:
-        for i in range(0,max_samples):
+        for i in range(0, max_samples):
             samples['temperatureA'].append(0)
             samples['humidityA'].append(0)
             samples['airqualityA'].append(0)
             samples['temperatureB'].append(0)
             samples['humidityB'].append(0)
             samples['airqualityB'].append(0)
-    if (max_samples < 0) or (max_samples < fig_samples):
+    if (max_samples < 1) or (max_samples < fig_samples):
         return
     pos = 0
     while True:
@@ -65,38 +66,41 @@ def main():
             t_humi = float(res_humidityA.payload.decode('utf-8'))
             t_airq = float(res_airqualityA.payload.decode('utf-8'))
             if not app_samples:
-                samples['temperatureA'][pos] = t_temp
-                samples['humidityA'][pos] = t_humi
-                samples['airqualityA'][pos] = t_airq
-            else:
-                samples['temperatureA'].append(t_temp)
-                samples['humidityA'].append(t_humi)
-                samples['airqualityA'].append(t_airq)
+                samples['temperatureA'].popleft()
+                samples['humidityA'].popleft()
+                samples['airqualityA'].popleft()
+            # end if
+            samples['temperatureA'].append(t_temp)
+            samples['humidityA'].append(t_humi)
+            samples['airqualityA'].append(t_airq)
             print('SensorA -- Temperatur: %2.2f, Humitdy: %2.2f, AirQuality: %2.2f' %(t_temp, t_humi, t_airq))
-            if use_sensorB:
-                try:
-                    res_temperatureB = yield from protocol.request(req_temperatureB).response
-                    res_humidityB = yield from protocol.request(req_humidityB).response
-                    res_airqualityB = yield from protocol.request(req_airqualityB).response
-                except Exception as e:
-                    print('Failed to fetch resource:')
-                    print(e)
-                else:
-                    t_temp = float(res_temperatureB.payload.decode('utf-8'))
-                    t_humi = float(res_humidityB.payload.decode('utf-8'))
-                    t_airq = float(res_airqualityB.payload.decode('utf-8'))
-                    if not app_samples:
-                        samples['temperatureB'][pos] = t_temp
-                        samples['humidityB'][pos] = t_humi
-                        samples['airqualityB'][pos] = t_airq
-                    else:
-                        samples['temperatureB'].append(t_temp)
-                        samples['humidityB'].append(t_humi)
-                        samples['airqualityB'].append(t_airq)
+        if use_sensorB:
+            try:
+                res_temperatureB = yield from protocol.request(req_temperatureB).response
+                res_humidityB = yield from protocol.request(req_humidityB).response
+                res_airqualityB = yield from protocol.request(req_airqualityB).response
+            except Exception as e:
+                print('Failed to fetch resource:')
+                print(e)
+            else:
+                t_temp = float(res_temperatureB.payload.decode('utf-8'))
+                t_humi = float(res_humidityB.payload.decode('utf-8'))
+                t_airq = float(res_airqualityB.payload.decode('utf-8'))
+                if not app_samples:
+                    samples['temperatureB'].popleft()
+                    samples['humidityB'].popleft()
+                    samples['airqualityB'].popleft()
+                # end if
+                samples['temperatureB'].append(t_temp)
+                samples['humidityB'].append(t_humi)
+                samples['airqualityB'].append(t_airq)
 
-                    print('SensorB -- Temperatur: %2.2f, Humitdy: %2.2f, AirQuality: %2.2f' %(t_temp, t_humi, t_airq))
-        pos = (pos + 1) % max_samples
-        if (pos % fig_samples) == 0:
+                print('SensorB -- Temperatur: %2.2f, Humitdy: %2.2f, AirQuality: %2.2f' %(t_temp, t_humi, t_airq))
+            # end try
+        # end if use_sensorB
+
+        pos = (pos + 1) % fig_samples
+        if pos == 0:
             fig = plt.figure(figsize=(12,7))
             ax = fig.add_subplot(311)
             ax.plot(samples['temperatureA'])
