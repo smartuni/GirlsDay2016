@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 import numpy
 from matplotlib.ticker import FormatStrFormatter
 
-max_samples = 120
-fig_samples = 10
+max_samples = 60
+fig_samples = 5
 uri_sensorA = "[fe80::f353:4e59:71ba:600a%lowpan0]"
 uri_sensorB = "[fe80::5bb3:4e48:6fdc:6002%lowpan0]"
 yFormatter = FormatStrFormatter('%.2f')
@@ -37,9 +37,9 @@ def main():
             samples['temperatureB'].append(0)
             samples['humidityB'].append(0)
             samples['airqualityB'].append(0)
-    if max_samples < 1:
+    if (max_samples < 0) or (max_samples < fig_samples):
         return
-    pos = max_samples - 1
+    pos = 0
     while True:
         req_temperatureA = Message(code=GET)
         req_humidityA = Message(code=GET)
@@ -95,7 +95,7 @@ def main():
                         samples['airqualityB'].append(t_airq)
 
                     print('SensorB -- Temperatur: %2.2f, Humitdy: %2.2f, AirQuality: %2.2f' %(t_temp, t_humi, t_airq))
-        pos = (pos - 1) % max_samples
+        pos = (pos + 1) % max_samples
         if (pos % fig_samples) == 0:
             fig = plt.figure(figsize=(12,7))
             ax = fig.add_subplot(311)
