@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import numpy
 from matplotlib.ticker import FormatStrFormatter
 
-max_samples = 60
+max_samples = 100
 fig_samples = 5
 uri_sensorA = "[fe80::f353:4e59:71ba:600a%lowpan0]"
 uri_sensorB = "[fe80::5bb3:4e48:6fdc:6002%lowpan0]"
@@ -117,13 +117,13 @@ def main():
             az.plot(samples['airqualityA'])
             if use_sensorB:
                 az.plot(samples['airqualityB'])
-            az.set_xlabel('time (s)')
+            az.set_xlabel('samples [#]')
             az.set_ylabel('Pollution')
             az.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
             if use_sensorB:
                 plt.legend(['SensorA', 'SensorB'], loc="best")
             plt.savefig('sensordata.png')
-        time.sleep(1)
+            plt.close(fig)
 
 if __name__ == "__main__":
     asyncio.get_event_loop().run_until_complete(main())
