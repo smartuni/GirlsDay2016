@@ -6,7 +6,7 @@ import asyncio
 import time
 # plot stuff
 import matplotlib as mpl
-mpl.use("pdf")
+mpl.use("agg")
 import matplotlib.pyplot as plt
 import numpy
 from matplotlib.ticker import FormatStrFormatter
@@ -54,7 +54,7 @@ def main():
             print('Temperatur: %2.2f, Humitdy: %2.2f, AirQuality: %2.2f' %(t_temp, t_humi, t_airq))
             pos = (pos + 1) % max_samples
             if pos == 0:
-                fig = plt.figure()
+                fig = plt.figure(figsize=(8,5))
                 ax = fig.add_subplot(311)
                 ax.plot(samples['temperature'])
                 ax.set_title('Sensor data')
@@ -72,7 +72,7 @@ def main():
                 az.set_ylabel('AirQuality')
                 az.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
 
-                plt.savefig('sensordata_'+str(cnt)+'.pdf')
+                plt.savefig('sensordata.png')
                 cnt += 1
         time.sleep(1)
 
