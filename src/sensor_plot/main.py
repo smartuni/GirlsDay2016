@@ -60,9 +60,9 @@ def main():
             print('Failed to fetch resource:')
             print(e)
         else:
-            t_temp = float(res_temperature.payload.decode('utf-8'))
-            t_humi = float(res_humidity.payload.decode('utf-8'))
-            t_airq = float(res_airquality.payload.decode('utf-8'))
+            t_temp = float(res_temperatureA.payload.decode('utf-8'))
+            t_humi = float(res_humidityA.payload.decode('utf-8'))
+            t_airq = float(res_airqualityA.payload.decode('utf-8'))
             if not app_samples:
                 samples['temperatureA'][pos] = t_temp
                 samples['humidityA'][pos] = t_humi
