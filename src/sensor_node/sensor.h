@@ -12,7 +12,7 @@
 #ifndef SENSOR_H_
 #define SENSOR_H_
 
-#define SENSOR_MSG_QUEUE_SIZE   (10U)
+#define SENSOR_MSG_QUEUE_SIZE   (8U)
 #define SENSOR_TIMEOUT_MS       (500*1000) // 1s
 #define SENSOR_NUM_SAMPLES      (11U)
 int sensor_get_airquality(void);

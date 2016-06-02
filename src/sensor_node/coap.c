@@ -37,12 +37,13 @@
 #endif
 
 // parameters
-#define COAP_BUF_SIZE           (63)
+#define COAP_BUF_SIZE           (255)
 #define COAP_PORT               (5683)
 #define COAP_MSG_QUEUE_SIZE     (8U)
 #define COAP_REPSONSE_LENGTH    (1500)
+#define COAP_THREAD_STACKSIZE   (2 * THREAD_STACKSIZE_DEFAULT)
 
-static char coap_thread_stack[THREAD_STACKSIZE_DEFAULT];
+static char coap_thread_stack[COAP_THREAD_STACKSIZE];
 static msg_t coap_thread_msg_queue[COAP_MSG_QUEUE_SIZE];
 static char endpoints_response[COAP_REPSONSE_LENGTH] = "";
 static int poem_cnt = 0;
